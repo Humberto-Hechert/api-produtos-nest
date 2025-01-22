@@ -1,0 +1,53 @@
+version: '3.9'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api-produtos-nest
+    ports:
+      - '5077:5077'
+    environment:
+      NODE_ENV: production
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: humberto
+      DATABASE_PASSWORD: beto123
+      DATABASE_NAME: produtos
+    depends_on:
+      - postgres
+    networks: 
+      - app-network
+
+  postgres:
+    image: postgres:15
+    container_name: postgres-produtos
+    environment: 
+      POSTGRES_USER: humberto
+      POSTGRES_PASSWORD: beto123
+      POSTGRES_DB: produtos
+    ports: 
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+  
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: q1w2e3
+    ports:
+      - '8080:80'
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
