@@ -8,12 +8,12 @@ services:
     ports:
       - '5077:5077'
     environment:
-      NODE_ENV: production
-      DATABASE_HOST: postgres
-      DATABASE_PORT: 5432
-      DATABASE_USERNAME: humberto
-      DATABASE_PASSWORD: beto123
-      DATABASE_NAME: produtos
+      NODE_ENV: ${NODE_ENV}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
     depends_on:
       - postgres
     networks: 
@@ -23,9 +23,9 @@ services:
     image: postgres:15
     container_name: postgres-produtos
     environment: 
-      POSTGRES_USER: humberto
-      POSTGRES_PASSWORD: beto123
-      POSTGRES_DB: produtos
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
     ports: 
       - '5432:5432'
     volumes:
@@ -37,8 +37,8 @@ services:
     image: dpage/pgadmin4:latest
     container_name: pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: q1w2e3
+      PGADMIN_DEFAULT_EMAIL: ${PG_ADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PG_ADMIN_PASS}
     ports:
       - '8080:80'
     depends_on:
