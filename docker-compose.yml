@@ -1,12 +1,42 @@
 version: '3.9'
 services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
+    environment: 
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    ports: 
+      - '5433:5432'
+    volumes:
+      - local_pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PG_ADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PG_ADMIN_PASS}
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    ports:
+      - '8080:80'
+    depends_on:
+      - postgres
+    networks:
+      - backend
+
   api:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: api-produtos-nest
-    ports:
-      - '5077:5077'
+    restart: always
     environment:
       NODE_ENV: ${NODE_ENV}
       DB_HOST: ${DB_HOST}
@@ -14,40 +44,18 @@ services:
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
       DB_NAME: ${DB_NAME}
+      PORT: ${PORT}
+    ports:
+      - '5077:5077'
     depends_on:
       - postgres
     networks: 
-      - app-network
-
-  postgres:
-    image: postgres:15
-    container_name: postgres-produtos
-    environment: 
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASS}
-      POSTGRES_DB: ${DB_NAME}
-    ports: 
-      - '5432:5432'
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - app-network
-  
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PG_ADMIN_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PG_ADMIN_PASS}
-    ports:
-      - '8080:80'
-    depends_on:
-      - postgres
-    networks:
-      - app-network
+      - backend
 
 volumes:
-  postgres_data:
+  local_pgdata:
+  pgadmin-data:
 
 networks:
-  app-network:
+  backend:
+    driver: bridge
